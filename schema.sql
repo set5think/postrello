@@ -1,5 +1,6 @@
 BEGIN;
 
+  DROP SCHEMA IF EXISTS postrello CASCADE;
   CREATE SCHEMA postrello;
 
   CREATE TABLE postrello.organizations (
@@ -8,7 +9,9 @@ BEGIN;
     name TEXT NOT NULL,
     display_name TEXT NOT NULL,
     description TEXT,
-    url TEXT NOT NULL
+    url TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE postrello.members (
@@ -18,7 +21,9 @@ BEGIN;
     full_name TEXT,
     avatar_id TEXT,
     bio TEXT,
-    url TEXT NOT NULL
+    url TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE postrello.boards (
@@ -28,7 +33,9 @@ BEGIN;
     description TEXT,
     closed BOOLEAN NOT NULL DEFAULT FALSE,
     url TEXT NOT NULL,
-    organization_id INTEGER NOT NULL
+    organization_id INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE postrello.lists (
@@ -37,7 +44,9 @@ BEGIN;
     name TEXT NOT NULL,
     closed BOOLEAN NOT NULL DEFAULT FALSE,
     board_id INTEGER NOT NULL,
-    position INTEGER NOT NULL
+    position INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE postrello.cards (
@@ -52,7 +61,9 @@ BEGIN;
     board_id INTEGER NOT NULL,
     member_ids INTEGER[], -- does it make more sense to make a card_members board to support less inferior DBs?
     list_id INTEGER NOT NULL,
-    position INTEGER NOT NULL
+    position INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE postrello.checklists (
@@ -64,7 +75,9 @@ BEGIN;
     url TEXT,
     complete BOOLEAN NOT NULL DEFAULT FALSE, --derived value from checklist_items
     card_id INTEGER NOT NULL,
-    board_id INTEGER NOT NULL
+    board_id INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE postrello.checklist_items (
@@ -76,7 +89,9 @@ BEGIN;
     position INTEGER NOT NULL,
     checklist_id INTEGER NOT NULL,
     card_id INTEGER NOT NULL,
-    board_id INTEGER NOT NULL
+    board_id INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
   -- Helper functions
@@ -132,4 +147,4 @@ BEGIN;
   LANGUAGE 'SQL' IMMUTABLE;
   GRANT EXECUTE ON FUNCTION postrello.convert_state_to_boolean(TEXT) TO PUBLIC;
 
-ROLLBACK;
+COMMIT;
