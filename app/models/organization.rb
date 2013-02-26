@@ -18,6 +18,23 @@ class Organization < ActiveRecord::Base
     end
   end
 
+  def add_boards
+    trello_org = Trello::Organization.find(self.name)
+    trello_boards = trello_org.boards
+    trello_boards.each do |board|
+      b = Board.find_or_initialize_by_trello_id(board.attributes[:id])
+      if b.new_record?
+        b.name = board.attributes[:name]
+        b.description = board.attributes[:description]
+        b.closed = board.attributes[:closed]
+        b.url = board.attributes[:url]
+        b.organization_id = self.id
+        b.save
+      end
+      b.add_cards
+    end
+  end
+
   private
 
   def self.add_organization(org_name)

@@ -62,6 +62,7 @@ BEGIN;
     member_ids INTEGER[], -- does it make more sense to make a card_members board to support less inferior DBs?
     list_id INTEGER NOT NULL,
     position INTEGER NOT NULL,
+    points FLOAT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -146,5 +147,24 @@ BEGIN;
   $$
   LANGUAGE 'SQL' IMMUTABLE;
   GRANT EXECUTE ON FUNCTION postrello.convert_state_to_boolean(TEXT) TO PUBLIC;
+
+  --trigger to update points
+  CREATE OR REPLACE FUNCTION postrello.update_points() RETURNS TRIGGER AS
+  $$
+  DECLARE _points FLOAT := (SELECT unnest(regexp_matches(NEW.name, E'\\((\\d+)\\)'))::FLOAT);
+  BEGIN
+    IF _points IS NOT NULL THEN
+      NEW.points = _points;
+    END IF;
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.update_points() TO PUBLIC;
+
+  CREATE TRIGGER points_detector
+  BEFORE INSERT OR UPDATE OF name
+  ON postrello.cards
+  FOR EACH ROW EXECUTE PROCEDURE postrello.update_points();
 
 COMMIT;
