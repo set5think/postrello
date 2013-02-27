@@ -3,12 +3,13 @@ class List < ActiveRecord::Base
   belongs_to :organization
   has_many :cards
 
-  def add_cards
+  def add_or_update_cards
     trello_list = Trello::List.find(self.trello_id)
     trello_cards = trello_list.cards
     trello_cards.each do |card|
+      checksum = Digest::MD5.hexdigest(card.attributes.to_s)
       c = Card.find_or_initialize_by_trello_id(card.attributes[:id])
-      if c.new_record?
+      if c.new_record? || checksum != c.hexdigest
         c.short_id = card.attributes[:short_id]
         c.name = card.attributes[:name]
         c.description = card.attributes[:description]
@@ -26,6 +27,7 @@ class List < ActiveRecord::Base
             end
           end
         end
+        c.hexdigest = checksum
         c.save
       end
     end

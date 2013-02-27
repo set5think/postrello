@@ -10,6 +10,7 @@ BEGIN;
     display_name TEXT NOT NULL,
     description TEXT,
     url TEXT NOT NULL,
+    hexdigest text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -22,6 +23,7 @@ BEGIN;
     avatar_id TEXT,
     bio TEXT,
     url TEXT,
+    hexdigest text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -34,6 +36,7 @@ BEGIN;
     closed BOOLEAN NOT NULL DEFAULT FALSE,
     url TEXT NOT NULL,
     organization_id INTEGER NOT NULL,
+    hexdigest text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -45,6 +48,7 @@ BEGIN;
     closed BOOLEAN NOT NULL DEFAULT FALSE,
     board_id INTEGER NOT NULL,
     position INTEGER NOT NULL,
+    hexdigest text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -62,6 +66,7 @@ BEGIN;
     member_ids INTEGER[], -- does it make more sense to make a card_members board to support less inferior DBs?
     list_id INTEGER NOT NULL,
     position INTEGER NOT NULL,
+    hexdigest text NOT NULL,
     points FLOAT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -77,6 +82,7 @@ BEGIN;
     complete BOOLEAN NOT NULL DEFAULT FALSE, --derived value from checklist_items
     card_id INTEGER NOT NULL,
     board_id INTEGER NOT NULL,
+    hexdigest text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -91,6 +97,7 @@ BEGIN;
     checklist_id INTEGER NOT NULL,
     card_id INTEGER NOT NULL,
     board_id INTEGER NOT NULL,
+    hexdigest text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
