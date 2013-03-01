@@ -5,6 +5,15 @@ class Card < ActiveRecord::Base
   has_many :checklists
   has_many :checklist_items
 
+  #TODO finish this method, and determine how to store labels < cards
+  def add_or_update_labels
+    trello_card = Trello::Card.find(self.trello_id)
+    labels = trello_card.labels
+    unless labels.empty?
+      puts labels.to_s
+    end
+  end
+
   def add_or_update_checklists
     trello_card = Trello::Card.find(self.trello_id)
     trello_checklists = trello_card.checklists
