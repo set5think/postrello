@@ -4,6 +4,10 @@ class Card < ActiveRecord::Base
   belongs_to :organization
   has_many :checklists
   has_many :checklist_items
+  has_and_belongs_to_many :members,
+                          :finder_sql => proc {"SELECT * FROM members WHERE id IN (SELECT unnest(member_ids) FROM cards WHERE id = #{id})"}
+  has_and_belongs_to_many :labels,
+                          :finder_sql => proc {"SELECT * FROM labels WHERE id IN (SELECT unnest(label_ids) FROM cards WHERE id = #{id})"}
 
   #TODO finish this method, and determine how to store labels < cards
   def add_or_update_labels
