@@ -1,5 +1,6 @@
 class Member < ActiveRecord::Base
   has_and_belongs_to_many :organizations
+  has_many :cards, :foreign_key => 'member_ids'
 
   class << self
 

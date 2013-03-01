@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130224061813) do
+ActiveRecord::Schema.define(:version => 20130228183252) do
 
   create_table "boards", :force => true do |t|
     t.text     "trello_id",                          :null => false
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
     t.boolean  "closed",          :default => false, :null => false
     t.text     "url",                                :null => false
     t.integer  "organization_id",                    :null => false
+    t.text     "hexdigest",                          :null => false
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
   end
@@ -27,19 +28,21 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
   add_index "boards", ["trello_id"], :name => "boards_trello_id_key", :unique => true
 
   create_table "cards", :force => true do |t|
-    t.text     "trello_id",                                     :null => false
-    t.integer  "short_id",                                      :null => false
-    t.text     "name",                                          :null => false
+    t.text     "trello_id",                      :null => false
+    t.integer  "short_id",                       :null => false
+    t.text     "name",                           :null => false
     t.text     "description"
     t.datetime "due_date"
-    t.boolean  "closed",                     :default => false, :null => false
-    t.text     "url",                                           :null => false
-    t.integer  "board_id",                                      :null => false
-    t.string   "member_ids",  :limit => nil
-    t.integer  "list_id",                                       :null => false
-    t.integer  "position",                                      :null => false
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
+    t.boolean  "closed",      :default => false, :null => false
+    t.text     "url",                            :null => false
+    t.integer  "board_id",                       :null => false
+    t.integer  "member_ids",                                     :array => true
+    t.integer  "list_id",                        :null => false
+    t.integer  "position",                       :null => false
+    t.text     "hexdigest",                      :null => false
+    t.float    "points"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
   end
 
   add_index "cards", ["trello_id"], :name => "cards_trello_id_key", :unique => true
@@ -53,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
     t.integer  "checklist_id",                    :null => false
     t.integer  "card_id",                         :null => false
     t.integer  "board_id",                        :null => false
+    t.text     "hexdigest",                       :null => false
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
   end
@@ -68,6 +72,7 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
     t.boolean  "complete",    :default => false, :null => false
     t.integer  "card_id",                        :null => false
     t.integer  "board_id",                       :null => false
+    t.text     "hexdigest",                      :null => false
     t.datetime "created_at",                     :null => false
     t.datetime "updated_at",                     :null => false
   end
@@ -80,6 +85,7 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
     t.boolean  "closed",     :default => false, :null => false
     t.integer  "board_id",                      :null => false
     t.integer  "position",                      :null => false
+    t.text     "hexdigest",                     :null => false
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
   end
@@ -93,11 +99,17 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
     t.text     "avatar_id"
     t.text     "bio"
     t.text     "url"
+    t.text     "hexdigest",  :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
 
   add_index "members", ["trello_id"], :name => "members_trello_id_key", :unique => true
+
+  create_table "members_organizations", :id => false, :force => true do |t|
+    t.integer "member_id"
+    t.integer "organization_id"
+  end
 
   create_table "organizations", :force => true do |t|
     t.text     "trello_id",    :null => false
@@ -105,6 +117,7 @@ ActiveRecord::Schema.define(:version => 20130224061813) do
     t.text     "display_name", :null => false
     t.text     "description"
     t.text     "url",          :null => false
+    t.text     "hexdigest",    :null => false
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end

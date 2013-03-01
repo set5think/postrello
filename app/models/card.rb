@@ -2,7 +2,6 @@ class Card < ActiveRecord::Base
   belongs_to :board
   belongs_to :list
   belongs_to :organization
-  has_and_belongs_to_many :member
   has_many :checklists
   has_many :checklist_items
 

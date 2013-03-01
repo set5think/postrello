@@ -41,6 +41,17 @@ BEGIN;
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
+  CREATE TABLE postrello.labels (
+    id SERIAL PRIMARY KEY NOT NULL,
+    board_id INTEGER NOT NULL,
+    color TEXT NOT NULL,
+    value TEXT,
+    hexdigest TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(board_id, color)
+  );
+
   CREATE TABLE postrello.lists (
     id SERIAL PRIMARY KEY NOT NULL,
     trello_id TEXT UNIQUE NOT NULL,

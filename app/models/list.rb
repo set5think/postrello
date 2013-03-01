@@ -5,7 +5,7 @@ class List < ActiveRecord::Base
 
   def add_or_update_cards
     trello_list = Trello::List.find(self.trello_id)
-    trello_cards = trello_list.cards
+    trello_cards = trello_list.cards({:filter => [:all]})
     trello_cards.each do |card|
       checksum = Digest::MD5.hexdigest(card.attributes.to_s)
       c = Card.find_or_initialize_by_trello_id(card.attributes[:id])

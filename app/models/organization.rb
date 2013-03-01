@@ -1,6 +1,8 @@
 class Organization < ActiveRecord::Base
   has_and_belongs_to_many :members
   has_many :boards
+  has_many :cards, :through => :boards
+  has_many :lists, :through => :boards
 
   def add_or_update_members
     trello_org = Trello::Organization.find(self.name)
