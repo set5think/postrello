@@ -4,17 +4,24 @@ class Card < ActiveRecord::Base
   belongs_to :organization
   has_many :checklists
   has_many :checklist_items
-  has_and_belongs_to_many :members,
-                          :finder_sql => proc {"SELECT * FROM members WHERE id IN (SELECT unnest(member_ids) FROM cards WHERE id = #{id})"}
-  has_and_belongs_to_many :labels,
-                          :finder_sql => proc {"SELECT * FROM labels WHERE id IN (SELECT unnest(label_ids) FROM cards WHERE id = #{id})"}
 
-  #TODO finish this method, and determine how to store labels < cards
+  def members
+    Member.find_by_sql("SELECT * FROM members WHERE id IN (SELECT unnest(member_ids) FROM cards WHERE id = #{self.id})")
+  end
+
+  def labels
+    Label.find_by_sql("SELECT * FROM labels WHERE id IN (SELECT unnest(label_ids) FROM cards WHERE id = #{self.id})")
+  end
+
   def add_or_update_labels
     trello_card = Trello::Card.find(self.trello_id)
-    labels = trello_card.labels
-    unless labels.empty?
-      puts labels.to_s
+    _labels = trello_card.labels
+    unless _labels.empty?
+      _labels.each do |label|
+        l = Label.find_or_create_and_return(self.board_id, label)
+        self.label_ids << l.id
+      end
+      self.save
     end
   end
 

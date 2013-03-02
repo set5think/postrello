@@ -1,8 +1,9 @@
 class Member < ActiveRecord::Base
   has_and_belongs_to_many :organizations
-  has_and_belongs_to_many :cards,
-                          :foreign_key => 'member_ids',
-                          :finder_sql => proc {"SELECT * FROM cards WHERE ARRAY[#{id}] <@ member_ids"}
+
+  def cards
+    Card.find_by_sql("SELECT * FROM cards WHERE ARRAY[#{self.id}] <@ member_ids")
+  end
 
   class << self
 

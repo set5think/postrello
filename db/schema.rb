@@ -27,16 +27,33 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
 
   add_index "boards", ["trello_id"], :name => "boards_trello_id_key", :unique => true
 
+  create_table "boards_histories", :force => true do |t|
+    t.integer  "board_id",                            :null => false
+    t.text     "trello_id",                           :null => false
+    t.text     "name",                                :null => false
+    t.text     "description"
+    t.boolean  "closed",           :default => false, :null => false
+    t.text     "url",                                 :null => false
+    t.integer  "organization_id",                     :null => false
+    t.text     "hexdigest",                           :null => false
+    t.datetime "board_created_at",                    :null => false
+    t.datetime "board_updated_at",                    :null => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+  end
+
   create_table "cards", :force => true do |t|
     t.text     "trello_id",                      :null => false
     t.integer  "short_id",                       :null => false
     t.text     "name",                           :null => false
     t.text     "description"
     t.datetime "due_date"
+    t.datetime "last_active"
     t.boolean  "closed",      :default => false, :null => false
     t.text     "url",                            :null => false
     t.integer  "board_id",                       :null => false
     t.integer  "member_ids",                                     :array => true
+    t.integer  "label_ids",                                      :array => true
     t.integer  "list_id",                        :null => false
     t.integer  "position",                       :null => false
     t.text     "hexdigest",                      :null => false
@@ -46,6 +63,29 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
   end
 
   add_index "cards", ["trello_id"], :name => "cards_trello_id_key", :unique => true
+
+  create_table "cards_histories", :force => true do |t|
+    t.integer  "card_id",                            :null => false
+    t.text     "trello_id",                          :null => false
+    t.integer  "short_id",                           :null => false
+    t.text     "name",                               :null => false
+    t.text     "description"
+    t.datetime "due_date"
+    t.datetime "last_active"
+    t.boolean  "closed",          :default => false, :null => false
+    t.text     "url",                                :null => false
+    t.integer  "board_id",                           :null => false
+    t.integer  "member_ids",                                         :array => true
+    t.integer  "label_ids",                                          :array => true
+    t.integer  "list_id",                            :null => false
+    t.integer  "position",                           :null => false
+    t.text     "hexdigest",                          :null => false
+    t.float    "points"
+    t.datetime "card_created_at",                    :null => false
+    t.datetime "card_updated_at",                    :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
 
   create_table "checklist_items", :force => true do |t|
     t.text     "trello_id",                       :null => false
@@ -63,6 +103,23 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
 
   add_index "checklist_items", ["trello_id"], :name => "checklist_items_trello_id_key", :unique => true
 
+  create_table "checklist_items_histories", :force => true do |t|
+    t.integer  "checklist_item_id",                            :null => false
+    t.text     "trello_id",                                    :null => false
+    t.text     "name",                                         :null => false
+    t.boolean  "complete",                  :default => false, :null => false
+    t.text     "item_type",                                    :null => false
+    t.integer  "position",                                     :null => false
+    t.integer  "checklist_id",                                 :null => false
+    t.integer  "card_id",                                      :null => false
+    t.integer  "board_id",                                     :null => false
+    t.text     "hexdigest",                                    :null => false
+    t.datetime "checklist_item_created_at",                    :null => false
+    t.datetime "checklist_item_updated_at",                    :null => false
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
+  end
+
   create_table "checklists", :force => true do |t|
     t.text     "trello_id",                      :null => false
     t.text     "name",                           :null => false
@@ -79,6 +136,46 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
 
   add_index "checklists", ["trello_id"], :name => "checklists_trello_id_key", :unique => true
 
+  create_table "checklists_histories", :force => true do |t|
+    t.integer  "checklist_id",                            :null => false
+    t.text     "trello_id",                               :null => false
+    t.text     "name",                                    :null => false
+    t.text     "description"
+    t.boolean  "closed",               :default => false, :null => false
+    t.text     "url"
+    t.boolean  "complete",             :default => false, :null => false
+    t.integer  "card_id",                                 :null => false
+    t.integer  "board_id",                                :null => false
+    t.text     "hexdigest",                               :null => false
+    t.datetime "checklist_created_at",                    :null => false
+    t.datetime "checklist_updated_at",                    :null => false
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
+  end
+
+  create_table "labels", :force => true do |t|
+    t.integer  "board_id",   :null => false
+    t.text     "color",      :null => false
+    t.text     "value"
+    t.text     "hexdigest",  :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "labels", ["board_id", "color"], :name => "labels_board_id_color_key", :unique => true
+
+  create_table "labels_histories", :force => true do |t|
+    t.integer  "label_id",         :null => false
+    t.integer  "board_id",         :null => false
+    t.text     "color",            :null => false
+    t.text     "value"
+    t.text     "hexdigest",        :null => false
+    t.datetime "label_created_at", :null => false
+    t.datetime "label_updated_at", :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
   create_table "lists", :force => true do |t|
     t.text     "trello_id",                     :null => false
     t.text     "name",                          :null => false
@@ -91,6 +188,20 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
   end
 
   add_index "lists", ["trello_id"], :name => "lists_trello_id_key", :unique => true
+
+  create_table "lists_histories", :force => true do |t|
+    t.integer  "list_id",                            :null => false
+    t.text     "trello_id",                          :null => false
+    t.text     "name",                               :null => false
+    t.boolean  "closed",          :default => false, :null => false
+    t.integer  "board_id",                           :null => false
+    t.integer  "position",                           :null => false
+    t.text     "hexdigest",                          :null => false
+    t.datetime "list_created_at",                    :null => false
+    t.datetime "list_updated_at",                    :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
 
   create_table "members", :force => true do |t|
     t.text     "trello_id",  :null => false
@@ -105,6 +216,21 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
   end
 
   add_index "members", ["trello_id"], :name => "members_trello_id_key", :unique => true
+
+  create_table "members_histories", :force => true do |t|
+    t.integer  "member_id",         :null => false
+    t.text     "trello_id",         :null => false
+    t.text     "username",          :null => false
+    t.text     "full_name"
+    t.text     "avatar_id"
+    t.text     "bio"
+    t.text     "url"
+    t.text     "hexdigest",         :null => false
+    t.datetime "member_created_at", :null => false
+    t.datetime "member_updated_at", :null => false
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
 
   create_table "members_organizations", :id => false, :force => true do |t|
     t.integer "member_id"
@@ -123,6 +249,20 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
   end
 
   add_index "organizations", ["trello_id"], :name => "organizations_trello_id_key", :unique => true
+
+  create_table "organizations_histories", :force => true do |t|
+    t.integer  "organization_id",         :null => false
+    t.text     "trello_id",               :null => false
+    t.text     "name",                    :null => false
+    t.text     "display_name",            :null => false
+    t.text     "description"
+    t.text     "url",                     :null => false
+    t.text     "hexdigest",               :null => false
+    t.datetime "organization_created_at", :null => false
+    t.datetime "organization_updated_at", :null => false
+    t.datetime "created_at",              :null => false
+    t.datetime "updated_at",              :null => false
+  end
 
   create_table "users", :force => true do |t|
     t.string   "name"

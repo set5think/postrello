@@ -134,7 +134,7 @@ BEGIN;
     position INTEGER NOT NULL,
     hexdigest text NOT NULL,
     list_created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    list_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    list_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
@@ -162,7 +162,7 @@ BEGIN;
 
   CREATE TABLE postrello.cards_histories (
     id SERIAL PRIMARY KEY NOT NULL,
-    card_id INTEGER NOT NULL
+    card_id INTEGER NOT NULL,
     trello_id TEXT NOT NULL,
     short_id INTEGER NOT NULL,
     name TEXT NOT NULL,
