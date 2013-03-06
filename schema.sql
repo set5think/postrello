@@ -326,4 +326,174 @@ BEGIN;
 
   --trigger to update histories tables
 
+  CREATE OR REPLACE FUNCTION postrello.organization_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.organizations_histories
+    (organization_id, trello_id, name, display_name, description,
+     url, hexdigest, organization_created_at, organization_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.name, OLD.display_name, OLD.description,
+     OLD.url, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.organization_manager() TO PUBLIC;
+
+  CREATE TRIGGER organization_history_logger
+  AFTER UPDATE
+  ON postrello.organizations
+  FOR EACH ROW EXECUTE PROCEDURE postrello.organization_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.member_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.members_histories
+    (member_id, trello_id, username, full_name, avatar_id, bio,
+     url, hexdigest, member_created_at, member_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.username, OLD.full_name, OLD.avatar_id, OLD.bio,
+     OLD.url, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.member_manager() TO PUBLIC;
+
+  CREATE TRIGGER member_history_logger
+  AFTER UPDATE
+  ON postrello.members
+  FOR EACH ROW EXECUTE PROCEDURE postrello.member_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.board_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.boards_histories
+    (board_id, trello_id, name, description, closed, url,
+     organization_id, hexdigest, board_created_at, board_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.name, OLD.description, OLD.closed, OLD.url,
+     OLD.organization_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.board_manager() TO PUBLIC;
+
+  CREATE TRIGGER board_history_logger
+  AFTER UPDATE
+  ON postrello.boards
+  FOR EACH ROW EXECUTE PROCEDURE postrello.board_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.label_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.labels_histories
+    (label_id, board_id, color, value,
+     hexdigest, label_created_at, label_updated_at)
+    VALUES
+    (OLD.id, OLD.board_id, OLD.color, OLD.value,
+     OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.label_manager() TO PUBLIC;
+
+  CREATE TRIGGER label_history_logger
+  AFTER UPDATE
+  ON postrello.labels
+  FOR EACH ROW EXECUTE PROCEDURE postrello.label_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.list_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.lists_histories
+    (list_id, trello_id, name, closed, board_id,
+     position, hexdigest, list_created_at, list_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.name, OLD.closed, OLD.board_id,
+     OLD.position, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.list_manager() TO PUBLIC;
+
+  CREATE TRIGGER list_history_logger
+  AFTER UPDATE
+  ON postrello.lists
+  FOR EACH ROW EXECUTE PROCEDURE postrello.list_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.card_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.cards_histories
+    (card_id, trello_id, short_id, name, description, due_date, last_active,
+     closed, url, board_id, member_ids, label_ids, list_id,
+     position, hexdigest, points, card_created_at, card_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.short_id, OLD.name, OLD.description, OLD.due_date,
+     OLD.last_active, OLD.closed, OLD.url, OLD.board_id, OLD.member_ids, OLD.label_ids,
+     OLD.list_id, OLD.position, OLD.hexdigest, OLD.points, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.card_manager() TO PUBLIC;
+
+  CREATE TRIGGER card_history_logger
+  AFTER UPDATE
+  ON postrello.cards
+  FOR EACH ROW EXECUTE PROCEDURE postrello.card_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.checklist_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.checklists_histories
+    (checklist_id, trello_id, name, description, closed, url, complete,
+     card_id, board_id, hexdigest, points, checklist_created_at, checklist_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.name, OLD.description, OLD.closed, OLD.url, OLD.complete,
+     OLD.card_id, OLD.board_id, OLD.hexdigest, OLD.points, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.checklist_manager() TO PUBLIC;
+
+  CREATE TRIGGER checklist_history_logger
+  AFTER UPDATE
+  ON postrello.checklists
+  FOR EACH ROW EXECUTE PROCEDURE postrello.checklist_manager();
+
+  CREATE OR REPLACE FUNCTION postrello.checklist_item_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+  BEGIN
+    INSERT INTO postrello.checklist_items_histories
+    (checklist_item_id, trello_id, name, complete, item_type, position, checklist_id,
+     card_id, board_id, hexdigest, checklist_item_created_at, checklist_item_updated_at)
+    VALUES
+    (OLD.id, OLD.trello_id, OLD.name, OLD.complete, OLD.item_type, OLD.position, OLD.checklist_id,
+     OLD.card_id, OLD.board_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.checklist_item_manager() TO PUBLIC;
+
+  CREATE TRIGGER checklist_item_history_logger
+  AFTER UPDATE
+  ON postrello.checklist_items
+  FOR EACH ROW EXECUTE PROCEDURE postrello.checklist_item_manager();
+
 COMMIT;

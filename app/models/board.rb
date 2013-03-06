@@ -52,7 +52,7 @@ class Board < ActiveRecord::Base
         c.name = card.attributes[:name]
         c.description = card.attributes[:description]
         c.due_date = card.attributes[:due]
-        c.last_active = card.attributes[:last_active_date]
+        c.last_active = card.attributes[:last_activity_date]
         c.closed = card.attributes[:closed]
         c.url = card.attributes[:url]
         c.board_id = self.id

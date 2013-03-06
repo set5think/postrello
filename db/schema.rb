@@ -13,6 +13,8 @@
 
 ActiveRecord::Schema.define(:version => 20130228183252) do
 
+  add_extension "hstore"
+
   create_table "boards", :force => true do |t|
     t.text     "trello_id",                          :null => false
     t.text     "name",                               :null => false
