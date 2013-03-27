@@ -16,6 +16,7 @@ class Organization < ActiveRecord::Base
         m.avatar_id = member.attributes[:avatar_id]
         m.bio = member.attributes[:bio]
         m.url = member.attributes[:url]
+        m.email = member.attributes[:email]
         m.hexdigest = checksum
         m.save
       end

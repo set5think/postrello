@@ -11,9 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130228183252) do
+ActiveRecord::Schema.define(:version => 20130327054846) do
 
   add_extension "hstore"
+
+  create_table "board_settings", :force => true do |t|
+    t.integer  "board_id",   :null => false
+    t.hstore   "settings"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "boards", :force => true do |t|
     t.text     "trello_id",                          :null => false
@@ -155,6 +162,15 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
     t.datetime "updated_at",                              :null => false
   end
 
+  create_table "iterations", :force => true do |t|
+    t.date     "start_date",       :null => false
+    t.date     "end_date",         :null => false
+    t.float    "estimated_points", :null => false
+    t.float    "points"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
   create_table "labels", :force => true do |t|
     t.integer  "board_id",   :null => false
     t.text     "color",      :null => false
@@ -215,6 +231,7 @@ ActiveRecord::Schema.define(:version => 20130228183252) do
     t.text     "hexdigest",  :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.text     "email"
   end
 
   add_index "members", ["trello_id"], :name => "members_trello_id_key", :unique => true
