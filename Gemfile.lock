@@ -22,6 +22,10 @@ GEM
       activesupport (= 3.2.11)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
+    activerecord-postgres-hstore (0.7.5)
+      activerecord (>= 3.1)
+      pg-hstore (>= 1.1.5)
+      rake
     activeresource (3.2.11)
       activemodel (= 3.2.11)
       activesupport (= 3.2.11)
@@ -74,6 +78,7 @@ GEM
       omniauth-oauth
     orm_adapter (0.4.0)
     pg (0.14.1)
+    pg-hstore (1.1.7)
     pg_array_parser (0.0.8)
     polyglot (0.3.3)
     postgres_ext (0.2.2)
@@ -112,6 +117,8 @@ GEM
       json
       oauth (~> 0.4.5)
       rest-client (~> 1.6.7)
+    safe_attributes (1.0.10)
+      activerecord (>= 3.0.0)
     sass (3.2.5)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -139,6 +146,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-postgres-hstore
   coffee-rails (~> 3.2.1)
   devise
   jquery-rails
@@ -148,6 +156,7 @@ DEPENDENCIES
   postgres_ext
   rails (= 3.2.11)
   ruby-trello
+  safe_attributes
   sass-rails (~> 3.2.3)
   sqlite3
   uglifier (>= 1.0.3)

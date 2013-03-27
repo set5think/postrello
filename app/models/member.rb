@@ -5,6 +5,10 @@ class Member < ActiveRecord::Base
     Card.find_by_sql("SELECT * FROM cards WHERE ARRAY[#{self.id}] <@ member_ids")
   end
 
+  def in_organization?(org)
+    self.organizations.include?(org)
+  end
+
   class << self
 
     def get_member_id(_trello_id)

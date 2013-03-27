@@ -1,0 +1,25 @@
+<h3>New Iteration</h3>
+<%= stylesheet_link_tag 'jquery.datepick' %>
+<%= javascript_include_tag 'jquery.datepick' %>
+<%= form_for(@iteration, :method => :post) do |f| %>
+  <div>
+    <%= f.label :start_date, 'Start date' %>
+    <%= f.text_field :start_date, :class => 'datepicker', :style => 'width:auto'%>
+  </div>
+  <div>
+    <%= f.label :end_date, 'End date' %>
+    <%= f.text_field :end_date, :class => 'datepicker', :style => 'width:auto' %>
+  </div>
+  <div>
+    <%= f.label :estimated_points, 'Estimated points' %>
+    <%= f.text_field :estimated_points, :style => 'width:auto'%>
+  </div>
+  <p>
+    <%= f.submit 'Create', :style => 'width:auto' %>
+    <%= link_to 'Cancel', settings_path, :class => 'button', :style => 'width:auto' %>
+  </p>
+<% end %>
+
+<script type="text/javascript">
+  $('.datepicker').datepick({dateFormat: 'yyyy-mm-dd'});
+</script>

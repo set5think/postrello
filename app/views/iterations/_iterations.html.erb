@@ -1,0 +1,11 @@
+<div id="iterations">
+<% @iterations.each_with_index do |iteration, index| %>
+  <div class="iteration">
+    <span>
+      <%= "Iteration #{index+1}: #{iteration.start_date} - #{iteration.end_date} | estimated points: #{iteration.estimated_points}" %>
+      <%= link_to 'Edit', edit_iteration_path(iteration) %> |
+      <%= link_to 'Delete', iteration_path(iteration), :method => :delete %>
+    </span>
+  </div>
+<% end %>
+</div>

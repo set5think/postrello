@@ -16,3 +16,4 @@
 
 # Ignore config file
 /config/trello_config.yml
+/config/initializers/secret_token.rb

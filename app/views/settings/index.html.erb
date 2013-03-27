@@ -1,0 +1,15 @@
+<div id="configurations">
+  <div id="iteration_configurations">
+    <h2>Configure Iterations</h2>
+    <%= link_to 'New Iteration', new_iteration_path %>
+    <%= render :partial => 'iterations/iterations' %>
+  </div>
+  <div id="board_configurations">
+    <h2>Configure Boards</h2>
+    <% @boards.each do |board| %>
+      <div class="board">
+        <%= link_to(board.name, board.configured? ? edit_board_setting_path(board, board.board_setting) : new_board_setting_path(board)) %>
+      </div>
+    <% end %>
+  </div>
+</div>

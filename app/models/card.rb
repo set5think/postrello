@@ -5,6 +5,13 @@ class Card < ActiveRecord::Base
   has_many :checklists
   has_many :checklist_items
 
+  scope :without_points, where('points IS NULL')
+  scope :with_points, where('points IS NOT NULL')
+
+  def self.average_score
+    sprintf('%05.2f', self.sum('points')/self.with_points.count)
+  end
+
   def members
     Member.find_by_sql("SELECT * FROM members WHERE id IN (SELECT unnest(member_ids) FROM cards WHERE id = #{self.id})")
   end
@@ -41,8 +48,8 @@ class Card < ActiveRecord::Base
           ch.board_id = self.board.id
           ch.hexdigest = checksum
           ch.save
-          ch.add_or_update_checklist_items(checklist.attributes[:check_items])
         end
+        ch.add_or_update_checklist_items(checklist.attributes[:check_items])
       end
     end
   end

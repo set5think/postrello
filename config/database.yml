@@ -8,7 +8,7 @@ development:
   database: postrello_development
   pool: 5
   timeout: 5000
-  schema_search_path: postrello
+  schema_search_path: postrello, public
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -18,11 +18,11 @@ test:
   database: postrello_test
   pool: 5
   timeout: 5000
-  schema_search_path: postrello
+  schema_search_path: postrello, public
 
 production:
   adapter: postgresql
   database: postrello
   pool: 5
   timeout: 5000
-  schema_search_path: postrello
+  schema_search_path: postrello, public

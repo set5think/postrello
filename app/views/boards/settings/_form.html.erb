@@ -1,0 +1,19 @@
+<%= form_for(@board_setting, :method => method) do |f| %>
+  <div>
+    <%= f.label :backlog_queue, 'Backlog Queue' %>
+    <%= f.collection_select(:backlog_queue, @board.lists, :id, :name) %>
+  </div>
+   <div>
+    <%= f.label :working_queue, 'Working Queue' %>
+    <%= f.collection_select(:working_queue, @board.lists, :id, :name) %>
+  </div>
+   <div>
+    <%= f.label :done_queue, 'Done Queue' %>
+    <%= f.collection_select(:done_queue, @board.lists, :id, :name) %>
+  </div>
+    <p>
+    <%= f.submit 'Create', :style => 'width:auto' %>
+    <%= link_to 'Cancel', settings_path, :class => 'button', :style => 'width:auto' %>
+  </p>
+<% end %>
+

@@ -1,0 +1,16 @@
+<div class="organization">
+  <p><%= "#{@organization.display_name} (#{@organization.name})" %></p>
+  <p>Members</p>
+  <ul>
+    <% @organization.members.each do |member| %>
+      <li><%= link_to "#{member.full_name} (#{member.username})", member_path(member) %></li>
+    <% end %>
+  </ul>
+  <br/>
+  <p>Boards</p>
+  <ul>
+    <% @organization.boards.each do |board| %>
+      <li><%= link_to board.name, organization_board_path(@organization, board) %></li>
+    <% end %>
+  </ul>
+</div>

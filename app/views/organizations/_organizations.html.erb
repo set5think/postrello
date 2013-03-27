@@ -1,0 +1,16 @@
+<h2>My Organizations</h2>
+<div id="organizations">
+  <% @organizations.each do |organization| %>
+    <div class="organization">
+      <p><%= link_to "#{organization.display_name} (#{organization.name})", organization_path(organization) %></p>
+      <ul>
+        <li>Member count: <%= organization.members.count %></li>
+        <li>Board count: <%= organization.boards.count %></li>
+        <li>Card count: <%= organization.cards.count %></li>
+        <li>Unscored card count: <%= organization.cards.without_points.count %></li>
+        <li>Average score per card: <%= organization.cards.average_score %></li>
+      </ul>
+    </div>
+    <br/>
+  <% end %>
+</div>

@@ -5,6 +5,18 @@ Postrello::Application.routes.draw do
     get '/users/auth/:provider' => 'users/omniauth_callbacks#passthru'
   end
 
+  resources :iterations
+  resources :boards do
+    resources :settings, :controller => 'boards/settings'
+  end
+  resources :members
+  resources :organizations do
+    resources :members
+    resources :boards
+  end
+
+  match '/settings' => 'settings#index', :as => 'settings'
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

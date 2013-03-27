@@ -12,6 +12,8 @@ gem 'postgres_ext'
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-trello'
+gem 'activerecord-postgres-hstore'
+gem 'safe_attributes'
 
 # Gems used only for assets and not required
 # in production environments by default.

@@ -19,6 +19,9 @@ class Organization < ActiveRecord::Base
         m.hexdigest = checksum
         m.save
       end
+      unless m.in_organization?(self)
+        m.organizations << self
+      end
     end
   end
 

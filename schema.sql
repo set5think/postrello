@@ -3,6 +3,24 @@ BEGIN;
   DROP SCHEMA IF EXISTS postrello CASCADE;
   CREATE SCHEMA postrello;
 
+  CREATE TABLE postrello.iterations (
+    id SERIAL PRIMARY KEY NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    estimated_points FLOAT NOT NULL,
+    points FLOAT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE postrello.board_settings (
+    id SERIAL PRIMARY KEY NOT NULL,
+    board_id INTEGER NOT NULL,
+    settings HSTORE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+
   CREATE TABLE postrello.organizations (
     id SERIAL PRIMARY KEY NOT NULL,
     trello_id TEXT UNIQUE NOT NULL,
@@ -324,18 +342,62 @@ BEGIN;
   ON postrello.cards
   FOR EACH ROW EXECUTE PROCEDURE postrello.update_points();
 
+  --trigger to update completion of a checklist based on the completion
+  --of its checklist items
+
+  CREATE OR REPLACE FUNCTION postrello.checklist_completion_manager() RETURNS TRIGGER AS
+  $$
+  DECLARE
+    complete_value  BOOLEAN := FALSE;
+    _id             INTEGER := (SELECT CASE
+                                  WHEN TG_OP = 'DELETE' THEN OLD.checklist_id
+                                  ELSE NEW.checklist_id
+                                END);
+    items           INTEGER := (SELECT COUNT(*)
+                                FROM postrello.checklist_items
+                                WHERE checklist_id = _id);
+    complete_items  INTEGER := (SELECT COUNT(*)
+                                FROM postrello.checklist_items
+                                WHERE checklist_id = _id
+                                AND complete IS TRUE);
+  BEGIN
+    IF items = complete_items THEN
+      complete_value := TRUE;
+    END IF;
+
+    UPDATE postrello.checklists
+    SET complete = complete_value
+    WHERE id = _id;
+
+    IF TG_OP = 'DELETE' THEN
+      RETURN OLD;
+    ELSE
+      RETURN NEW;
+    END IF;
+  END;
+  $$
+  LANGUAGE 'PLPGSQL' VOLATILE;
+  GRANT EXECUTE ON FUNCTION postrello.checklist_completion_manager() TO PUBLIC;
+
+  CREATE TRIGGER checklist_complete
+  BEFORE DELETE OR INSERT OR UPDATE OF complete
+  ON postrello.checklist_items
+  FOR EACH ROW EXECUTE PROCEDURE postrello.checklist_completion_manager();
+
   --trigger to update histories tables
 
   CREATE OR REPLACE FUNCTION postrello.organization_manager() RETURNS TRIGGER AS
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.organizations_histories
-    (organization_id, trello_id, name, display_name, description,
-     url, hexdigest, organization_created_at, organization_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.name, OLD.display_name, OLD.description,
-     OLD.url, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.organizations_histories
+      (organization_id, trello_id, name, display_name, description,
+       url, hexdigest, organization_created_at, organization_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.name, OLD.display_name, OLD.description,
+       OLD.url, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -351,12 +413,14 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.members_histories
-    (member_id, trello_id, username, full_name, avatar_id, bio,
-     url, hexdigest, member_created_at, member_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.username, OLD.full_name, OLD.avatar_id, OLD.bio,
-     OLD.url, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.members_histories
+      (member_id, trello_id, username, full_name, avatar_id, bio,
+       url, hexdigest, member_created_at, member_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.username, OLD.full_name, OLD.avatar_id, OLD.bio,
+       OLD.url, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -372,12 +436,14 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.boards_histories
-    (board_id, trello_id, name, description, closed, url,
-     organization_id, hexdigest, board_created_at, board_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.name, OLD.description, OLD.closed, OLD.url,
-     OLD.organization_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.boards_histories
+      (board_id, trello_id, name, description, closed, url,
+       organization_id, hexdigest, board_created_at, board_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.name, OLD.description, OLD.closed, OLD.url,
+       OLD.organization_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -393,12 +459,14 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.labels_histories
-    (label_id, board_id, color, value,
-     hexdigest, label_created_at, label_updated_at)
-    VALUES
-    (OLD.id, OLD.board_id, OLD.color, OLD.value,
-     OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.labels_histories
+      (label_id, board_id, color, value,
+       hexdigest, label_created_at, label_updated_at)
+      VALUES
+      (OLD.id, OLD.board_id, OLD.color, OLD.value,
+       OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -414,12 +482,14 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.lists_histories
-    (list_id, trello_id, name, closed, board_id,
-     position, hexdigest, list_created_at, list_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.name, OLD.closed, OLD.board_id,
-     OLD.position, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.lists_histories
+      (list_id, trello_id, name, closed, board_id,
+       position, hexdigest, list_created_at, list_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.name, OLD.closed, OLD.board_id,
+       OLD.position, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -435,14 +505,16 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.cards_histories
-    (card_id, trello_id, short_id, name, description, due_date, last_active,
-     closed, url, board_id, member_ids, label_ids, list_id,
-     position, hexdigest, points, card_created_at, card_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.short_id, OLD.name, OLD.description, OLD.due_date,
-     OLD.last_active, OLD.closed, OLD.url, OLD.board_id, OLD.member_ids, OLD.label_ids,
-     OLD.list_id, OLD.position, OLD.hexdigest, OLD.points, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.cards_histories
+      (card_id, trello_id, short_id, name, description, due_date, last_active,
+       closed, url, board_id, member_ids, label_ids, list_id,
+       position, hexdigest, points, card_created_at, card_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.short_id, OLD.name, OLD.description, OLD.due_date,
+       OLD.last_active, OLD.closed, OLD.url, OLD.board_id, OLD.member_ids, OLD.label_ids,
+       OLD.list_id, OLD.position, OLD.hexdigest, OLD.points, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -458,12 +530,14 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.checklists_histories
-    (checklist_id, trello_id, name, description, closed, url, complete,
-     card_id, board_id, hexdigest, points, checklist_created_at, checklist_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.name, OLD.description, OLD.closed, OLD.url, OLD.complete,
-     OLD.card_id, OLD.board_id, OLD.hexdigest, OLD.points, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.checklists_histories
+      (checklist_id, trello_id, name, description, closed, url, complete,
+       card_id, board_id, hexdigest, checklist_created_at, checklist_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.name, OLD.description, OLD.closed, OLD.url, OLD.complete,
+       OLD.card_id, OLD.board_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$
@@ -479,12 +553,14 @@ BEGIN;
   $$
   DECLARE
   BEGIN
-    INSERT INTO postrello.checklist_items_histories
-    (checklist_item_id, trello_id, name, complete, item_type, position, checklist_id,
-     card_id, board_id, hexdigest, checklist_item_created_at, checklist_item_updated_at)
-    VALUES
-    (OLD.id, OLD.trello_id, OLD.name, OLD.complete, OLD.item_type, OLD.position, OLD.checklist_id,
-     OLD.card_id, OLD.board_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    IF (MD5((SELECT NEW::TEXT)) <> MD5((SELECT OLD::TEXT))) THEN
+      INSERT INTO postrello.checklist_items_histories
+      (checklist_item_id, trello_id, name, complete, item_type, position, checklist_id,
+       card_id, board_id, hexdigest, checklist_item_created_at, checklist_item_updated_at)
+      VALUES
+      (OLD.id, OLD.trello_id, OLD.name, OLD.complete, OLD.item_type, OLD.position, OLD.checklist_id,
+       OLD.card_id, OLD.board_id, OLD.hexdigest, OLD.created_at, OLD.updated_at);
+    END IF;
     RETURN NEW;
   END;
   $$

@@ -3,6 +3,11 @@ class Board < ActiveRecord::Base
   has_many :cards
   has_many :lists
   has_many :labels
+  has_one :board_setting
+
+  def configured?
+    !self.board_setting.nil? && !self.board_setting.settings.empty?
+  end
 
   def add_or_update_labels
     trello_board = Trello::Board.find(self.trello_id)
