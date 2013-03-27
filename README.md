@@ -10,7 +10,7 @@ Postrello
 
 ````
 rake db:create
-psql
+psql -d postrello_development -f schema.sql
 rake admin:add_user[username,password]
 rake trello:organization:upsert[organization_name]
 ````
