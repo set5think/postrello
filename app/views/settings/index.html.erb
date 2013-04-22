@@ -4,12 +4,24 @@
     <%= link_to 'New Iteration', new_iteration_path %>
     <%= render :partial => 'iterations/iterations' %>
   </div>
-  <div id="board_configurations">
-    <h2>Configure Boards</h2>
-    <% @boards.each do |board| %>
-      <div class="board">
-        <%= link_to(board.name, board.configured? ? edit_board_setting_path(board, board.board_setting) : new_board_setting_path(board)) %>
+</div>
+<div class="row">
+  <div class="span10">
+    <h3 class="demo-panel-title">Configure Boards</h3>
+    <div class="row mbl">
+    <% @boards.each_with_index do |board, index| %>
+      <div class="span2">
+        <dl class="palette palette-<%="#{PALETTES[index % PALETTES.length]}"%>">
+          <dt>
+            <%= link_to(board.name, board.configured? ? edit_board_setting_path(board, board.board_setting) : new_board_setting_path(board), :style => 'color: white')%>
+          </dt>
+        </dl>
       </div>
+    <% if index % 5 == 4 %>
+      </div>
+      <div class="row mbl">
     <% end %>
+  <% end %>
+    </div>
   </div>
 </div>

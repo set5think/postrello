@@ -2,6 +2,8 @@
 <html>
 <head>
   <title>Postrello</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
   <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" %>
@@ -9,18 +11,71 @@
 </head>
   <body>
     <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <% if user_signed_in? %>
-      Logged in as <strong><%= current_user.email %></strong>.
-      <%= link_to "Home", root_path %> |
-      <%= link_to "Settings", settings_path %> |
-      <%= link_to "Logout", destroy_user_session_path, method: :delete %>
-    <% else %>
-      <%= link_to "Login", new_user_session_path %>
-    <% end %>
-    <h1 class="postrello_headline"><%= link_to 'Postrello', root_path %></h1>
+    <div class="container">
+      <div class="row demo-row">
+        <div class="span12">
+          <div class="navbar navbar-inverse">
+            <div class="navbar-inner">
+              <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <div class="nav-collapse collapse navbar-fixed-bottom">
+                  <ul class="nav">
+                    <li class="brand label-info">
+                      <%= link_to "Postrello", root_path %>
+                    </li>
+                  <% if user_signed_in? %>
+                    <li class="brand">
+                      <%= link_to current_user.email, '#' %>
+                      <ul>
+                        <li>
+                          <a href="#">Change Password</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="brand">
+                      <%= link_to "Settings", settings_path %>
+                      <ul>
+                        <li>
+                          <a href="#">Organizations</a>
+                        </li>
+                        <li>
+                          <a href="#">Members</a>
+                        </li>
+                        <li>
+                          <a href="#">Boards</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="brand">
+                      <a href="#">Reports</a>
+                    </li>
+                    <li class="brand">
+                      <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+                    </li>
+                  <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <%# <div class="row demo-samples">%>
+      <%#   <div class="span4 offset8">%>
+      <%#     <div class="todo mrm">%>
+      <%#       <div class="todo-search">%>
+      <%#         <input class="todo-search-field" type="search" placeholder="Search">%>
+      <%#       </div>%>
+      <%#     </div>%>
+      <%#   </div>%>
+      <%# </div>%>
 
-    <%= yield %>
+      <%= yield %>
 
+    </div>
   </body>
 </html>

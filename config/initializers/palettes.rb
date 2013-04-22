@@ -1,0 +1,22 @@
+PALETTES = %w(
+  firm
+  firm-dark
+  success
+  success-dark
+  info
+  info-dark
+  amethyst
+  wisteria
+  night
+  night-dark
+  bright
+  bright-dark
+  carrot
+  pumpkin
+  alizarin
+  pomegranate
+  clouds
+  silver
+  concrete
+  asbestos
+)

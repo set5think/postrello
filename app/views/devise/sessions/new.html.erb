@@ -1,17 +1,26 @@
-<h2>Sign in</h2>
+<div class="row">
+  <div class="span4 offset4">
+  <h4 class="text-center">Welcome to <small>Postrello</small></h4>
+  <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
+  <div class="login-form">
+    <div class="control-group">
+      <%= f.email_field :email, :autofocus => true, :class => 'login-field', :placeholder => 'Enter your email' %>
+      <label class="login-field-icon fui-man-16" for="user[email]"></label>
+    </div>
+    <div class="control-group">
+      <%= f.password_field :password, :class => 'login-field', :placeholder => 'Enter your password' %>
+      <label class="login-field-icon fui-lock-16" for="user[password]"></label>
+    </div>
+    <% if devise_mapping.rememberable? -%>
+      <label class="checkbox" for="user[remember_me]">
+        <%= f.check_box :remember_me %>
+        Remember me
+      </label>
+    <% end -%>
+    <%= f.submit "Sign in", :class => 'btn btn-primary btn-large btn-block' %>
+    <%= render "devise/shared/links" %>
+  </div>
+  <% end %>
+  </div>
+</div>
 
-<%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
-  <div><%= f.label :email %><br />
-  <%= f.email_field :email, :autofocus => true %></div>
-
-  <div><%= f.label :password %><br />
-  <%= f.password_field :password %></div>
-
-  <% if devise_mapping.rememberable? -%>
-    <div><%= f.check_box :remember_me %> <%= f.label :remember_me %></div>
-  <% end -%>
-
-  <div><%= f.submit "Sign in" %></div>
-<% end %>
-
-<%= render "devise/shared/links" %>
