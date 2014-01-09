@@ -1,7 +1,27 @@
 BEGIN;
 
+  CREATE EXTENSION IF NOT EXISTS hstore;
+
   DROP SCHEMA IF EXISTS postrello CASCADE;
   CREATE SCHEMA postrello;
+
+  CREATE TABLE postrello.etl_imports (
+    id            TEXT PRIMARY KEY NOT NULL,
+    trello_object TEXT NOT NULL,
+    started_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ended_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    succeeded     BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE postrello.import_contents (
+    id SERIAL PRIMARY KEY NOT NULL,
+    etl_manager_id TEXT NOT NULL,
+    data JSON NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
 
   CREATE TABLE postrello.iterations (
     id SERIAL PRIMARY KEY NOT NULL,
@@ -278,7 +298,7 @@ BEGIN;
     WHERE trello_id = $1
     LIMIT 1;
   $$
-  LANGUAGE 'SQL' STABLE;
+  LANGUAGE SQL STABLE;
   GRANT EXECUTE ON FUNCTION postrello.get_organization_id(TEXT) TO PUBLIC;
 
   CREATE OR REPLACE FUNCTION postrello.get_board_id(IN _trello_id TEXT) RETURNS INTEGER AS
@@ -288,7 +308,7 @@ BEGIN;
     WHERE trello_id = $1
     LIMIT 1;
   $$
-  LANGUAGE 'SQL' STABLE;
+  LANGUAGE SQL STABLE;
   GRANT EXECUTE ON FUNCTION postrello.get_board_id(TEXT) TO PUBLIC;
 
   CREATE OR REPLACE FUNCTION postrello.get_member_id(IN _trello_id TEXT) RETURNS INTEGER AS
@@ -298,7 +318,7 @@ BEGIN;
     WHERE trello_id = $1
     LIMIT 1;
   $$
-  LANGUAGE 'SQL' STABLE;
+  LANGUAGE SQL STABLE;
   GRANT EXECUTE ON FUNCTION postrello.get_member_id(TEXT) TO PUBLIC;
 
   CREATE OR REPLACE FUNCTION postrello.get_card_id(IN _trello_id TEXT) RETURNS INTEGER AS
@@ -308,7 +328,7 @@ BEGIN;
     WHERE trello_id = $1
     LIMIT 1;
   $$
-  LANGUAGE 'SQL' STABLE;
+  LANGUAGE SQL STABLE;
   GRANT EXECUTE ON FUNCTION postrello.get_card_id(TEXT) TO PUBLIC;
 
   CREATE OR REPLACE FUNCTION postrello.convert_state_to_boolean(IN state TEXT DEFAULT 'incomplete') RETURNS BOOLEAN AS
@@ -320,7 +340,7 @@ BEGIN;
         TRUE
     END;
   $$
-  LANGUAGE 'SQL' IMMUTABLE;
+  LANGUAGE SQL IMMUTABLE;
   GRANT EXECUTE ON FUNCTION postrello.convert_state_to_boolean(TEXT) TO PUBLIC;
 
   --trigger to update points
@@ -334,7 +354,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.update_points() TO PUBLIC;
 
   CREATE TRIGGER points_detector
@@ -376,7 +396,7 @@ BEGIN;
     END IF;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.checklist_completion_manager() TO PUBLIC;
 
   CREATE TRIGGER checklist_complete
@@ -401,7 +421,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.organization_manager() TO PUBLIC;
 
   CREATE TRIGGER organization_history_logger
@@ -424,7 +444,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.member_manager() TO PUBLIC;
 
   CREATE TRIGGER member_history_logger
@@ -447,7 +467,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.board_manager() TO PUBLIC;
 
   CREATE TRIGGER board_history_logger
@@ -470,7 +490,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.label_manager() TO PUBLIC;
 
   CREATE TRIGGER label_history_logger
@@ -493,7 +513,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.list_manager() TO PUBLIC;
 
   CREATE TRIGGER list_history_logger
@@ -518,7 +538,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.card_manager() TO PUBLIC;
 
   CREATE TRIGGER card_history_logger
@@ -541,7 +561,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.checklist_manager() TO PUBLIC;
 
   CREATE TRIGGER checklist_history_logger
@@ -564,7 +584,7 @@ BEGIN;
     RETURN NEW;
   END;
   $$
-  LANGUAGE 'PLPGSQL' VOLATILE;
+  LANGUAGE PLPGSQL VOLATILE;
   GRANT EXECUTE ON FUNCTION postrello.checklist_item_manager() TO PUBLIC;
 
   CREATE TRIGGER checklist_item_history_logger

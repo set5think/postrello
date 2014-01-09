@@ -1,1 +1,4 @@
 <%= render :partial => 'organizations/organizations' %>
+<% @data = {:labels => ["Hassan","Alan"],:datasets => [{:fillColor => "rgba(220,220,220,.5)", :strokeColor => "rgba(220,220,220,.5)", :data => [35,31]}]} %>
+<% @options = {:scaleOverride => true} %>
+<%= bar_chart @data[:labels], @data[:datasets], @options %>

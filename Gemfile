@@ -14,6 +14,8 @@ gem 'omniauth'
 gem 'omniauth-trello'
 gem 'activerecord-postgres-hstore'
 gem 'safe_attributes'
+gem 'queue_classic', '2.1.4'
+gem 'chartjs-ror'
 
 # Gems used only for assets and not required
 # in production environments by default.

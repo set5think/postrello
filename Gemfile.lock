@@ -36,6 +36,8 @@ GEM
     arel (3.0.2)
     bcrypt-ruby (3.0.1)
     builder (3.0.4)
+    chartjs-ror (1.0.1)
+      activesupport (> 3)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -77,13 +79,16 @@ GEM
       omniauth
       omniauth-oauth
     orm_adapter (0.4.0)
-    pg (0.14.1)
+    pg (0.15.1)
     pg-hstore (1.1.7)
     pg_array_parser (0.0.8)
     polyglot (0.3.3)
     postgres_ext (0.2.2)
       activerecord (~> 3.2.0)
       pg_array_parser (~> 0.0.8)
+    queue_classic (2.1.4)
+      multi_json (~> 1.7.2)
+      pg (~> 0.15.1)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -147,6 +152,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-postgres-hstore
+  chartjs-ror
   coffee-rails (~> 3.2.1)
   devise
   jquery-rails
@@ -154,6 +160,7 @@ DEPENDENCIES
   omniauth-trello
   pg
   postgres_ext
+  queue_classic (= 2.1.4)
   rails (= 3.2.11)
   ruby-trello
   safe_attributes
